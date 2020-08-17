@@ -23,6 +23,7 @@ class System {
  private:
   Processor cpu_ = {};
   std::vector<Process> processes_ = {};
+  std::vector<int> pids{};
 };
 
 #endif

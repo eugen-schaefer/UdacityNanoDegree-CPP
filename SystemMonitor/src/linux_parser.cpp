@@ -79,8 +79,9 @@ float LinuxParser::MemoryUtilization() {
   if (filestream.is_open()) {
     while (std::getline(filestream, line)) {
       string description_string, integer_string, unit_string;
-      std::istringstream linetream(line);
-      while (linetream >> description_string >> integer_string >> unit_string) {
+      std::istringstream linestream(line);
+      while (linestream >> description_string >> integer_string >>
+             unit_string) {
         if (description_string == "MemTotal:") {
           mem_total = std::stof(integer_string);
           ++number_parsed_lines;
@@ -100,8 +101,20 @@ float LinuxParser::MemoryUtilization() {
   return mem_used;
 }
 
-// TODO: Read and return the system uptime
-long LinuxParser::UpTime() { return 0; }
+// Read and return the system uptime
+long LinuxParser::UpTime() {
+  string line;
+  std::ifstream filestream(kProcDirectory + kUptimeFilename);
+
+  if (filestream.is_open()) {
+    std::getline(filestream, line);
+    string system_uptime;
+    std::istringstream linestream(line);
+    linestream >> system_uptime;
+    return stol(system_uptime);
+  }
+  return 0;
+}
 
 // TODO: Read and return the number of jiffies for the system
 long LinuxParser::Jiffies() { return 0; }

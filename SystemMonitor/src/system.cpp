@@ -25,6 +25,11 @@ vector<Process>& System::Processes() {
 
   // read all active pids
   pids = LinuxParser::Pids();
+//  pids.push_back(22939);
+//  pids.push_back(1098);
+//  pids.push_back(1103);
+//  pids.push_back(1104);
+
 
   // create a process instance for every pid and put it into processes_
   for (int elem : pids){

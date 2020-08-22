@@ -120,7 +120,7 @@ long LinuxParser::UpTime() {
 long LinuxParser::Jiffies() {
   long jiffies_total{};
   std::vector<std::string> parsed_cpu_numbers = LinuxParser::CpuUtilization();
-  for(const std::string& jiffy:parsed_cpu_numbers){
+  for (const std::string& jiffy : parsed_cpu_numbers) {
     jiffies_total += std::stol(jiffy);
   }
   return jiffies_total;
@@ -128,24 +128,34 @@ long LinuxParser::Jiffies() {
 
 // Read and return the number of active jiffies for a PID
 long LinuxParser::ActiveJiffies(int pid) {
-  std::vector<std::string> parsed_state_numbers =
-      LinuxParser::CpuUtilizationPerProcess(pid);
+  std::vector<std::string> parsed_process_status =
+      LinuxParser::ProcessStatus(pid);
 
-  if (!parsed_state_numbers.empty()) {
+  if (!parsed_process_status.empty()) {
     // assign currently parsed values
-    long utime{std::stol(parsed_state_numbers[static_cast<int>(
+    long utime{std::stol(parsed_process_status[static_cast<int>(
         LinuxParser::PROCESS_STAT::utime)])};
-    long stime{std::stol(parsed_state_numbers[static_cast<int>(
+    long stime{std::stol(parsed_process_status[static_cast<int>(
         LinuxParser::PROCESS_STAT::stime)])};
-    long cutime{std::stol(parsed_state_numbers[static_cast<int>(
+    long cutime{std::stol(parsed_process_status[static_cast<int>(
         LinuxParser::PROCESS_STAT::cutime)])};
-    long cstime{std::stol(parsed_state_numbers[static_cast<int>(
+    long cstime{std::stol(parsed_process_status[static_cast<int>(
         LinuxParser::PROCESS_STAT::cstime)])};
 
     // Calculation
     return utime + stime + cutime + cstime;
   }
   return 0;
+}
+
+char LinuxParser::ProcessState(int pid){
+  std::vector<std::string> parsed_process_status =
+      LinuxParser::ProcessStatus(pid);
+  if (!parsed_process_status.empty()){
+    std::string retVal{parsed_process_status[static_cast<int>(LinuxParser::PROCESS_STAT::state)]};
+    return retVal[0];
+  }
+  return ' ';
 }
 
 // TODO: Read and return the number of active jiffies for the system
@@ -260,9 +270,9 @@ string LinuxParser::User(int pid) {
   return string();
 }
 
-// Read and return CPU utilization per process
-vector<std::string> LinuxParser::CpuUtilizationPerProcess(int pid) {
-  std::vector<std::string> relevant_numbers(process_stat_size);
+// Read and return the status of the corresponding process
+vector<std::string> LinuxParser::ProcessStatus(int pid) {
+  std::vector<std::string> process_status(process_stat_size);
   string line;
   std::ifstream filestream(kProcDirectory + std::to_string(pid) +
                            kStatFilename);
@@ -273,26 +283,31 @@ vector<std::string> LinuxParser::CpuUtilizationPerProcess(int pid) {
     std::istringstream linestream(line);
     for (int idx = 0; idx < 22; ++idx) {
       switch (idx) {
+        case 2:
+          linestream >> process_status[static_cast<int>(PROCESS_STAT::state)];
+          break;
         case 13:
-          linestream >> relevant_numbers[static_cast<int>(PROCESS_STAT::utime)];
+          linestream >> process_status[static_cast<int>(PROCESS_STAT::utime)];
           break;
         case 14:
-          linestream >> relevant_numbers[static_cast<int>(PROCESS_STAT::stime)];
+          linestream >> process_status[static_cast<int>(PROCESS_STAT::stime)];
           break;
         case 15:
-          linestream >>
-              relevant_numbers[static_cast<int>(PROCESS_STAT::cutime)];
+          linestream >> process_status[static_cast<int>(PROCESS_STAT::cutime)];
           break;
         case 16:
+          linestream >> process_status[static_cast<int>(PROCESS_STAT::cstime)];
+          break;
+        case 21:
           linestream >>
-              relevant_numbers[static_cast<int>(PROCESS_STAT::cstime)];
+              process_status[static_cast<int>(PROCESS_STAT::starttime)];
           break;
         default:
           linestream >> temp_string;
           break;
       }
     }
-    return relevant_numbers;
+    return process_status;
   }
   return {};
 }

@@ -46,9 +46,11 @@ enum class PROCESS_STAT : unsigned int{
   stime = 1,
   cutime = 2,
   cstime = 3,
+  starttime = 4,
+  state = 5
 };
 
-constexpr unsigned int process_stat_size{4};
+constexpr unsigned int process_stat_size{6};
 
 std::vector<std::string> CpuUtilization();
 long Jiffies();
@@ -61,8 +63,9 @@ std::string Command(int pid);
 std::string Ram(int pid);
 std::string Uid(int pid);
 std::string User(int pid);
-std::vector<std::string> CpuUtilizationPerProcess(int pid);
+std::vector<std::string> ProcessStatus(int pid);
 long int UpTime(int pid);
+char ProcessState(int pid);
 };  // namespace LinuxParser
 
 #endif

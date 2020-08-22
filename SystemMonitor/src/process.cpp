@@ -19,23 +19,27 @@ int Process::Pid() const { return pid_; }
 // Return this process's CPU utilization
 /*
  * calculation source:
- * https://stackoverflow.com/questions/1420426/how-to-calculate-the-cpu-usage-of-a-process-by-pid-in-linux-from-c/1424556#1424556
+ * https://stackoverflow.com/questions/16726779/how-do-i-get-the-total-cpu-usage-of-an-application-from-proc-pid-stat/16736599#16736599
  * */
 float Process::CpuUtilization() {
   // old values from last cycle are the previous ones
   previous_process_jiffies = current_process_jiffies;
-  previous_total_cpu_jiffies = current_total_cpu_jeffies;
+  previous_process_uptime = current_process_uptime;
 
   // assign currently parsed values
   current_process_jiffies = LinuxParser::ActiveJiffies(pid_);
-  current_total_cpu_jeffies = LinuxParser::Jiffies();
+  current_process_uptime = LinuxParser::UpTime(pid_);
 
-  float retVal =
-      static_cast<float>((current_process_jiffies - previous_process_jiffies)) /
-      static_cast<float>(
-          (current_total_cpu_jeffies - previous_total_cpu_jiffies));
+  long jiffies_difference = current_process_jiffies - previous_process_jiffies;
+  long uptime_difference = current_process_uptime - previous_process_uptime;
 
-  return retVal;
+  if (uptime_difference == 0) {
+    return 0.0f;
+  } else {
+    return (static_cast<float>(jiffies_difference) /
+            static_cast<float>(sysconf(_SC_CLK_TCK))) /
+           static_cast<float>(uptime_difference);
+  }
 }
 
 // Return the command that generated this process

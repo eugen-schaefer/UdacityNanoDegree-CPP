@@ -21,19 +21,42 @@ Processor& System::Cpu() { return cpu_; }
 
 // TODO: Return a container composed of the system's processes
 vector<Process>& System::Processes() {
-  processes_.clear();
+  // clear all pids which were active in the previous cycle
   pids_.clear();
 
   // read all active pids
- //pids_ = LinuxParser::Pids();
-  pids_.push_back(8956);
+  pids_ = LinuxParser::Pids();
 
-  // create a process instance for every pid and put it into processes_
-  for (int elem : pids_){
-    Process process(elem);
-    // ignore zombie processes
-    if (!process.Command().empty()){
-      processes_.push_back(process);
+  // In case the process container does not contain the active pid, create a new
+  // process with the active pid and insert it into the process container
+  for (auto active_pid : pids_) {
+    bool is_active_pid_already_tracked{
+        std::any_of(processes_.begin(), processes_.end(),
+                    [active_pid](const Process& proc) {
+                      return proc.Pid() == active_pid;
+                    })};
+    if (!is_active_pid_already_tracked) {
+      Process process(active_pid);
+      char state = LinuxParser::ProcessState(active_pid);
+      // Don't insert processes with states "Zombie", "Stopped", "Dead"
+      if (state != 'Z' && state != 'T' && state != 't' && state != 'X' &&
+          state != 'x') {
+        processes_.push_back(process);
+      }
+    }
+  }
+
+  // Erase all entries in the process container which do not reflect the active
+  // pids
+  for (auto proc_iter = processes_.begin(); proc_iter != processes_.end();) {
+    bool is_process_pid_still_active{std::any_of(
+        pids_.begin(), pids_.end(),
+        [proc_iter](int pid) { return pid == (*proc_iter).Pid(); })};
+
+    if (is_process_pid_still_active) {
+      ++proc_iter;
+    } else {
+      proc_iter = processes_.erase(proc_iter);
     }
   }
 
@@ -56,6 +79,4 @@ int System::RunningProcesses() { return 0; }
 int System::TotalProcesses() { return 0; }
 
 // Return the number of seconds since the system started running
-long int System::UpTime() {
-  return LinuxParser::UpTime();
-}
+long int System::UpTime() { return LinuxParser::UpTime(); }

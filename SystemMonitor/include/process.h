@@ -21,9 +21,9 @@ class Process {
  private:
   int pid_{};
   long previous_process_jiffies{};
-  long previous_total_cpu_jiffies{};
   long current_process_jiffies{};
-  long current_total_cpu_jeffies{};
+  long previous_process_uptime{};
+  long current_process_uptime{};
 };
 
 #endif

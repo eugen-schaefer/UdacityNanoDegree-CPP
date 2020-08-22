@@ -22,17 +22,14 @@ Processor& System::Cpu() { return cpu_; }
 // TODO: Return a container composed of the system's processes
 vector<Process>& System::Processes() {
   processes_.clear();
+  pids_.clear();
 
   // read all active pids
-  pids = LinuxParser::Pids();
-//  pids.push_back(22939);
-//  pids.push_back(1098);
-//  pids.push_back(1103);
-//  pids.push_back(1104);
-
+ //pids_ = LinuxParser::Pids();
+  pids_.push_back(8956);
 
   // create a process instance for every pid and put it into processes_
-  for (int elem : pids){
+  for (int elem : pids_){
     Process process(elem);
     // ignore zombie processes
     if (!process.Command().empty()){

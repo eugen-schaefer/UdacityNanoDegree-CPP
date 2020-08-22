@@ -116,12 +116,37 @@ long LinuxParser::UpTime() {
   return 0;
 }
 
-// TODO: Read and return the number of jiffies for the system
-long LinuxParser::Jiffies() { return 0; }
+// Read and return the number of jiffies for the system
+long LinuxParser::Jiffies() {
+  long jiffies_total{};
+  std::vector<std::string> parsed_cpu_numbers = LinuxParser::CpuUtilization();
+  for(const std::string& jiffy:parsed_cpu_numbers){
+    jiffies_total += std::stol(jiffy);
+  }
+  return jiffies_total;
+}
 
-// TODO: Read and return the number of active jiffies for a PID
-// REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::ActiveJiffies(int pid [[maybe_unused]]) { return 0; }
+// Read and return the number of active jiffies for a PID
+long LinuxParser::ActiveJiffies(int pid) {
+  std::vector<std::string> parsed_state_numbers =
+      LinuxParser::CpuUtilizationPerProcess(pid);
+
+  if (!parsed_state_numbers.empty()) {
+    // assign currently parsed values
+    long utime{std::stol(parsed_state_numbers[static_cast<int>(
+        LinuxParser::PROCESS_STAT::utime)])};
+    long stime{std::stol(parsed_state_numbers[static_cast<int>(
+        LinuxParser::PROCESS_STAT::stime)])};
+    long cutime{std::stol(parsed_state_numbers[static_cast<int>(
+        LinuxParser::PROCESS_STAT::cutime)])};
+    long cstime{std::stol(parsed_state_numbers[static_cast<int>(
+        LinuxParser::PROCESS_STAT::cstime)])};
+
+    // Calculation
+    return utime + stime + cutime + cstime;
+  }
+  return 0;
+}
 
 // TODO: Read and return the number of active jiffies for the system
 long LinuxParser::ActiveJiffies() { return 0; }
@@ -235,9 +260,45 @@ string LinuxParser::User(int pid) {
   return string();
 }
 
-float LinuxParser::CpuUtilizationPerProcess(int pid) { return 0.0f; }
+// Read and return CPU utilization per process
+vector<std::string> LinuxParser::CpuUtilizationPerProcess(int pid) {
+  std::vector<std::string> relevant_numbers(process_stat_size);
+  string line;
+  std::ifstream filestream(kProcDirectory + std::to_string(pid) +
+                           kStatFilename);
 
-// TODO: Read and return the uptime of a process
+  if (filestream.is_open()) {
+    std::getline(filestream, line);
+    string temp_string;
+    std::istringstream linestream(line);
+    for (int idx = 0; idx < 22; ++idx) {
+      switch (idx) {
+        case 13:
+          linestream >> relevant_numbers[static_cast<int>(PROCESS_STAT::utime)];
+          break;
+        case 14:
+          linestream >> relevant_numbers[static_cast<int>(PROCESS_STAT::stime)];
+          break;
+        case 15:
+          linestream >>
+              relevant_numbers[static_cast<int>(PROCESS_STAT::cutime)];
+          break;
+        case 16:
+          linestream >>
+              relevant_numbers[static_cast<int>(PROCESS_STAT::cstime)];
+          break;
+        default:
+          linestream >> temp_string;
+          break;
+      }
+    }
+    return relevant_numbers;
+  }
+  return {};
+}
+
+// Read and return the uptime of a process
+// TODO: differ between Linux Kernel lower and greater than 2.6
 long LinuxParser::UpTime(int pid) {
   string line;
   std::ifstream filestream(kProcDirectory + std::to_string(pid) +

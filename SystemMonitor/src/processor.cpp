@@ -2,7 +2,7 @@
 
 #include "linux_parser.h"
 
-// TODO: Return the aggregate CPU utilization
+// Return the aggregate CPU utilization
 /*
  * calculation source:
  * https://stackoverflow.com/questions/23367857/accurate-calculation-of-cpu-usage-given-in-percentage-in-linux
@@ -24,8 +24,6 @@ float Processor::Utilization() {
     irq = std::stof(parsed_cpu_numbers[LinuxParser::kIRQ_]);
     softirq = std::stof(parsed_cpu_numbers[LinuxParser::kSoftIRQ_]);
     steal = std::stof(parsed_cpu_numbers[LinuxParser::kSteal_]);
-    guest = std::stof(parsed_cpu_numbers[LinuxParser::kGuest_]);
-    guest_nice = std::stof(parsed_cpu_numbers[LinuxParser::kGuestNice_]);
 
     // new assigned values are the current ones
     float current_idle_time{idle + iowait};

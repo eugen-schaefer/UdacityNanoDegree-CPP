@@ -40,6 +40,16 @@ enum CPUStates {
   kGuest_,
   kGuestNice_
 };
+
+enum class PROCESS_STAT : unsigned int{
+  utime = 0,
+  stime = 1,
+  cutime = 2,
+  cstime = 3,
+};
+
+constexpr unsigned int process_stat_size{4};
+
 std::vector<std::string> CpuUtilization();
 long Jiffies();
 long ActiveJiffies();
@@ -51,7 +61,7 @@ std::string Command(int pid);
 std::string Ram(int pid);
 std::string Uid(int pid);
 std::string User(int pid);
-float CpuUtilizationPerProcess(int pid);
+std::vector<std::string> CpuUtilizationPerProcess(int pid);
 long int UpTime(int pid);
 };  // namespace LinuxParser
 

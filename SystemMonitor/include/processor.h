@@ -3,9 +3,9 @@
 
 class Processor {
  public:
-  float Utilization();  // TODO: See src/processor.cpp
+  float Utilization();
 
-  // TODO: Declare any necessary private members
+  // Declare any necessary private members
  private:
   float user{};
   float nice{};
@@ -15,8 +15,6 @@ class Processor {
   float irq{};
   float softirq{};
   float steal{};
-  float guest{};
-  float guest_nice{};
 };
 
 #endif

@@ -19,11 +19,10 @@ class System {
   std::string Kernel();
   std::string OperatingSystem();
 
-  // TODO: rename private member such that they have m_ prefix
  private:
-  Processor cpu_ = {};
-  std::vector<Process> processes_ = {};
-  std::vector<int> pids_{};
+  Processor m_cpu = {};
+  std::vector<Process> m_processes = {};
+  std::vector<int> m_pids{};
 };
 
 #endif

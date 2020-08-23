@@ -17,21 +17,21 @@ using std::string;
 using std::vector;
 
 // Return the system's CPU
-Processor& System::Cpu() { return cpu_; }
+Processor& System::Cpu() { return m_cpu; }
 
 // Return a container composed of the system's processes
 vector<Process>& System::Processes() {
   // clear all pids which were active in the previous cycle
-  pids_.clear();
+  m_pids.clear();
 
   // read all active pids
-  pids_ = LinuxParser::Pids();
+  m_pids = LinuxParser::Pids();
 
   // In case the process container does not contain the active pid, create a new
   // process with the active pid and insert it into the process container
-  for (auto active_pid : pids_) {
+  for (auto active_pid : m_pids) {
     bool is_active_pid_already_tracked{
-        std::any_of(processes_.begin(), processes_.end(),
+        std::any_of(m_processes.begin(), m_processes.end(),
                     [active_pid](const Process& proc) {
                       return proc.Pid() == active_pid;
                     })};
@@ -40,30 +40,36 @@ vector<Process>& System::Processes() {
       char state = LinuxParser::ProcessState(active_pid);
       // Don't insert processes with states "Zombie", "Stopped", "Dead"
       if (state != 'Z' && state != 'T' && state != 't' && state != 'X' &&
-          state != 'x' && !process.Command().empty()) {
-        processes_.push_back(process);
+          state != 'x') {
+        m_processes.push_back(process);
       }
     }
   }
 
   // Erase all entries in the process container which do not reflect the active
   // pids
-  for (auto proc_iter = processes_.begin(); proc_iter != processes_.end();) {
+  for (auto proc_iter = m_processes.begin(); proc_iter != m_processes.end();) {
     bool is_process_pid_still_active{std::any_of(
-        pids_.begin(), pids_.end(),
+        m_pids.begin(), m_pids.end(),
         [proc_iter](int pid) { return pid == (*proc_iter).Pid(); })};
 
     if (is_process_pid_still_active) {
+      // update process states
+      // this approach updating the process states here helps avoid
+      // the circumstances during sorting where some pids might be not valid
+      // anymore
+      proc_iter->UpdateProcessInformation();
       ++proc_iter;
     } else {
-      proc_iter = processes_.erase(proc_iter);
+      proc_iter = m_processes.erase(proc_iter);
     }
   }
 
   // sort the process container
-  std::sort(processes_.begin(), processes_.end(), [](Process a, Process b){return a < b;});
+  std::sort(m_processes.begin(), m_processes.end(),
+            [](const Process& a, const Process& b) { return a < b; });
 
-  return processes_;
+  return m_processes;
 }
 
 // Return the system's kernel identifier (string)

@@ -13,9 +13,9 @@ using std::vector;
 
 // DONE: An example of how to read data from the filesystem
 string LinuxParser::OperatingSystem() {
-  string line;
-  string key;
-  string value;
+  string line{};
+  string key{};
+  string value{};
   std::ifstream filestream(kOSPath);
   if (filestream.is_open()) {
     while (std::getline(filestream, line)) {
@@ -36,8 +36,8 @@ string LinuxParser::OperatingSystem() {
 
 // DONE: An example of how to read data from the filesystem
 string LinuxParser::Kernel() {
-  string os, version, kernel;
-  string line;
+  string os{}, version{}, kernel{};
+  string line{};
   std::ifstream stream(kProcDirectory + kVersionFilename);
   if (stream.is_open()) {
     std::getline(stream, line);
@@ -49,7 +49,7 @@ string LinuxParser::Kernel() {
 
 // BONUS: Update this to use std::filesystem
 vector<int> LinuxParser::Pids() {
-  vector<int> pids;
+  vector<int> pids{};
   DIR* directory = opendir(kProcDirectory.c_str());
   struct dirent* file;
   while ((file = readdir(directory)) != nullptr) {
@@ -103,7 +103,7 @@ float LinuxParser::MemoryUtilization() {
 
 // Read and return the system uptime
 long LinuxParser::UpTime() {
-  string line;
+  string line{};
   std::ifstream filestream(kProcDirectory + kUptimeFilename);
 
   if (filestream.is_open()) {
@@ -165,6 +165,7 @@ long LinuxParser::ActiveJiffies() { return 0; }
 long LinuxParser::IdleJiffies() { return 0; }
 
 // Read and return CPU utilization
+// TODO: rename function into proper name like e.g. CpuStateParser
 vector<std::string> LinuxParser::CpuUtilization() {
   std::vector<std::string> relevant_numbers(10);
   string line;
@@ -302,7 +303,7 @@ string LinuxParser::User(int pid) {
   return string();
 }
 
-// Read and return the status of the corresponding process
+// Read and return selected status information of the corresponding process
 vector<std::string> LinuxParser::ProcessStatus(int pid) {
   std::vector<std::string> process_status(process_stat_size);
   string line;
@@ -347,20 +348,20 @@ vector<std::string> LinuxParser::ProcessStatus(int pid) {
 // Read and return the uptime of a process
 // TODO: differ between Linux Kernel lower and greater than 2.6
 long LinuxParser::UpTime(int pid) {
-  string line;
+  string line{};
   std::ifstream filestream(kProcDirectory + std::to_string(pid) +
                            kStatFilename);
 
   if (filestream.is_open()) {
     std::getline(filestream, line);
-    string process_uptime;
+    string process_starttime;
     std::istringstream linestream(line);
     for (int idx = 0; idx < 22; ++idx) {
-      linestream >> process_uptime;
+      linestream >> process_starttime;
     }
 
     return LinuxParser::UpTime() -
-           (stol(process_uptime)) / (sysconf(_SC_CLK_TCK));
+           (stoll(process_starttime)) / static_cast<long long>(sysconf(_SC_CLK_TCK));
   }
 
   return 0;

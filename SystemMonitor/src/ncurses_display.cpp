@@ -83,7 +83,7 @@ void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
   wattroff(window, COLOR_PAIR(2));
 
   // First, delete the old content from previous cycle
-  for (int row_index = 2; row_index < n; ++row_index) {
+  for (int row_index = 2; row_index < n+2; ++row_index) {
     mvwprintw(window, row_index, pid_column, " ");
     wclrtoeol(window);
   }

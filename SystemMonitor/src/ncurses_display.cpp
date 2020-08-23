@@ -1,14 +1,15 @@
+#include "ncurses_display.h"
+
 #include <curses.h>
+
+#include <algorithm>
 #include <chrono>
 #include <string>
 #include <thread>
 #include <vector>
 
 #include "format.h"
-#include "ncurses_display.h"
 #include "system.h"
-
-#include <algorithm>
 
 using std::string;
 using std::to_string;
@@ -44,6 +45,15 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   mvwprintw(window, row, 10, "");
   wprintw(window, ProgressBar(system.MemoryUtilization()).c_str());
   wattroff(window, COLOR_PAIR(1));
+
+  // First, delete the old content (total, running Processes and Up Time), from
+  // previous cycle
+  for (int row_index = 5; row_index < 8; ++row_index) {
+    mvwprintw(window, row_index, 1, " ");
+    wclrtoeol(window);
+  }
+
+  // Then, print new values
   mvwprintw(window, ++row, 2,
             ("Total Processes: " + to_string(system.TotalProcesses())).c_str());
   mvwprintw(
@@ -73,8 +83,8 @@ void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
   wattroff(window, COLOR_PAIR(2));
 
   // First, delete the old content from previous cycle
-  for (int row=2; row < n; ++row){
-    mvwprintw(window, row, pid_column, "");
+  for (int row_index = 2; row_index < n; ++row_index) {
+    mvwprintw(window, row_index, pid_column, " ");
     wclrtoeol(window);
   }
 

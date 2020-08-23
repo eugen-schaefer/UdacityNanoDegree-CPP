@@ -71,6 +71,14 @@ void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
   mvwprintw(window, row, time_column, "TIME+");
   mvwprintw(window, row, command_column, "COMMAND");
   wattroff(window, COLOR_PAIR(2));
+
+  // First, delete the old content from previous cycle
+  for (int row=2; row < n; ++row){
+    mvwprintw(window, row, pid_column, "");
+    wclrtoeol(window);
+  }
+
+  // Then, print new values
   int number_proc{static_cast<int>(processes.size())};
   for (int i = 0; i < std::min(number_proc, n); ++i) {
     mvwprintw(window, ++row, pid_column, to_string(processes[i].Pid()).c_str());
@@ -81,7 +89,7 @@ void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
     mvwprintw(window, row, time_column,
               Format::ElapsedTime(processes[i].UpTime()).c_str());
     mvwprintw(window, row, command_column,
-              processes[i].Command().substr(0, window->_maxx - 46).c_str());
+              processes[i].Command().substr(0, window->_maxx - 58).c_str());
   }
 }
 

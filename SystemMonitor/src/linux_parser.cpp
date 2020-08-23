@@ -188,11 +188,43 @@ vector<std::string> LinuxParser::CpuUtilization() {
   return {};
 }
 
-// TODO: Read and return the total number of processes
-int LinuxParser::TotalProcesses() { return 0; }
+// Read and return the total number of processes
+int LinuxParser::TotalProcesses() {
+  string line;
+  std::ifstream filestream(kProcDirectory + kStatFilename);
 
-// TODO: Read and return the number of running processes
-int LinuxParser::RunningProcesses() { return 0; }
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      string description_string, integer_string;
+      std::istringstream linestream(line);
+      while (linestream >> description_string >> integer_string) {
+        if (description_string == "processes") {
+          return std::stoi(integer_string);
+        }
+      }
+    }
+  }
+  return 0;
+}
+
+// Read and return the number of running processes
+int LinuxParser::RunningProcesses() {
+  string line;
+  std::ifstream filestream(kProcDirectory + kStatFilename);
+
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      string description_string, integer_string;
+      std::istringstream linestream(line);
+      while (linestream >> description_string >> integer_string) {
+        if (description_string == "procs_running") {
+          return std::stoi(integer_string);
+        }
+      }
+    }
+  }
+  return 0;
+}
 
 // Read and return the command associated with a process
 string LinuxParser::Command(int pid) {

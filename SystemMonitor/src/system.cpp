@@ -19,7 +19,7 @@ using std::vector;
 // Return the system's CPU
 Processor& System::Cpu() { return cpu_; }
 
-// TODO: Return a container composed of the system's processes
+// Return a container composed of the system's processes
 vector<Process>& System::Processes() {
   // clear all pids which were active in the previous cycle
   pids_.clear();
@@ -40,7 +40,7 @@ vector<Process>& System::Processes() {
       char state = LinuxParser::ProcessState(active_pid);
       // Don't insert processes with states "Zombie", "Stopped", "Dead"
       if (state != 'Z' && state != 'T' && state != 't' && state != 'X' &&
-          state != 'x') {
+          state != 'x' && !process.Command().empty()) {
         processes_.push_back(process);
       }
     }
@@ -60,6 +60,9 @@ vector<Process>& System::Processes() {
     }
   }
 
+  // sort the process container
+  std::sort(processes_.begin(), processes_.end(), [](Process a, Process b){return a < b;});
+
   return processes_;
 }
 
@@ -72,11 +75,11 @@ float System::MemoryUtilization() { return LinuxParser::MemoryUtilization(); }
 // Return the operating system name
 std::string System::OperatingSystem() { return LinuxParser::OperatingSystem(); }
 
-// TODO: Return the number of processes actively running on the system
-int System::RunningProcesses() { return 0; }
+// Return the number of processes actively running on the system
+int System::RunningProcesses() { return LinuxParser::RunningProcesses(); }
 
-// TODO: Return the total number of processes on the system
-int System::TotalProcesses() { return 0; }
+// Return the total number of processes on the system
+int System::TotalProcesses() { return LinuxParser::TotalProcesses(); }
 
 // Return the number of seconds since the system started running
 long int System::UpTime() { return LinuxParser::UpTime(); }

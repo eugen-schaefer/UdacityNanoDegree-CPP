@@ -27,8 +27,14 @@ float Process::CpuUtilization() {
   previous_process_uptime = current_process_uptime;
 
   // assign currently parsed values
-  current_process_jiffies = LinuxParser::ActiveJiffies(pid_);
-  current_process_uptime = LinuxParser::UpTime(pid_);
+  std::vector<std::string> parsed_process_status =
+      LinuxParser::ProcessStatus(Pid());
+  int starttime_index = static_cast<int>(LinuxParser::PROCESS_STAT::starttime);
+  long starttime = std::stol(parsed_process_status[starttime_index]);
+
+  current_process_jiffies = LinuxParser::ActiveJiffies(Pid());
+  current_process_uptime =
+      UpTime() - starttime / static_cast<long>(sysconf(_SC_CLK_TCK));
 
   long jiffies_difference = current_process_jiffies - previous_process_jiffies;
   long uptime_difference = current_process_uptime - previous_process_uptime;
@@ -43,11 +49,11 @@ float Process::CpuUtilization() {
 }
 
 // Return the command that generated this process
-string Process::Command() { return LinuxParser::Command(pid_); }
+string Process::Command() { return LinuxParser::Command(Pid()); }
 
 // Return this process's memory utilization
 string Process::Ram() {
-  std::string memory_str_KB{LinuxParser::Ram(pid_)};
+  std::string memory_str_KB{LinuxParser::Ram(Pid())};
   if (!memory_str_KB.empty()) {
     float memory_float_MB{std::stof(memory_str_KB) / 1000};
     int precision = 2;
@@ -59,13 +65,14 @@ string Process::Ram() {
 }
 
 // Return the user (name) that generated this process
-string Process::User() const { return LinuxParser::User(pid_); }
+string Process::User() const { return LinuxParser::User(Pid()); }
 
 // Return the age of this process (in seconds)
-long int Process::UpTime() const { return LinuxParser::UpTime(pid_); }
+long int Process::UpTime() const { return LinuxParser::UpTime(Pid()); }
 
-// TODO: Overload the "less than" comparison operator for Process objects
-// REMOVE: [[maybe_unused]] once you define the function
-bool Process::operator<(Process const& a [[maybe_unused]]) const {
-  return true;
+// Overload the "less than" comparison operator for Process objects
+bool Process::operator<(Process& a) {
+  return (this->CpuUtilization() > a.CpuUtilization());
+  // return (this->UpTime() > a.UpTime());
+  // return (std::stof(this->Ram()) > std::stof(a.Ram()));
 }

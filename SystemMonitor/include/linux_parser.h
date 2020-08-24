@@ -129,8 +129,7 @@ enum class PROCESS_STAT : unsigned int {
   utime,
   stime,
   cutime,
-  cstime,
-  starttime
+  cstime
 };
 
 std::string Command(int pid);

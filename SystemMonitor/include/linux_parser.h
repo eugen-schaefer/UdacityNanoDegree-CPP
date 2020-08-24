@@ -1,11 +1,10 @@
 #ifndef SYSTEM_PARSER_H
 #define SYSTEM_PARSER_H
 
+#include <cmath>
 #include <fstream>
 #include <regex>
 #include <string>
-
-#include <cmath>
 
 namespace LinuxParser {
 // Paths
@@ -57,14 +56,15 @@ const std::string kPasswordPath{"/etc/passwd"};
  * parameter "columns".
  */
 
-
 std::vector<std::string> ParseProcessFile(const std::string& abs_path,
                                           const std::string& lookup_token,
                                           char delimiter, int row,
                                           std::vector<int>& columns);
 
 // text line extraction
-/* ParseLine extracts required information from a text line by providing the line from which the information are to be extracted and the columns corresponding to the words in the text line.
+/* ParseLine extracts required information from a text line by providing the
+ * line from which the information are to be extracted and the columns
+ * corresponding to the words in the text line.
  *
  * @param line: line from which the information are to be extracted.
  *
@@ -78,20 +78,19 @@ std::vector<std::string> ParseProcessFile(const std::string& abs_path,
 std::vector<std::string> ParseLine(const std::string& line,
                                    std::vector<int>& columns);
 
-
 /*
  * Compare two floating point numbers against equality
  * @see https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
  */
-template<class T>
+template <class T>
 typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type
-almost_equal(T x, T y, int ulp)
-{
+almost_equal(T x, T y, int ulp) {
   // the machine epsilon has to be scaled to the magnitude of the values used
   // and multiplied by the desired precision in ULPs (units in the last place)
-  return std::fabs(x-y) <= std::numeric_limits<T>::epsilon() * std::fabs(x+y) * ulp
+  return std::fabs(x - y) <=
+             std::numeric_limits<T>::epsilon() * std::fabs(x + y) * ulp
          // unless the result is subnormal
-         || std::fabs(x-y) < std::numeric_limits<T>::min();
+         || std::fabs(x - y) < std::numeric_limits<T>::min();
 }
 
 // System

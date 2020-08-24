@@ -89,12 +89,11 @@ string LinuxParser::Kernel() {
   std::vector<int> columns_of_interest{2};
   parsed_information = LinuxParser::ParseProcessFile(
       kProcDirectory + kVersionFilename, {}, ' ', 0, columns_of_interest);
-  if(!parsed_information.empty()){
+  if (!parsed_information.empty()) {
     return parsed_information[0];
-  }else{
+  } else {
     return {};
   }
-
 }
 
 // BONUS: Update this to use std::filesystem
@@ -126,7 +125,7 @@ float LinuxParser::MemoryUtilization() {
   parsed_information =
       LinuxParser::ParseProcessFile(kProcDirectory + kMeminfoFilename,
                                     "MemTotal:", ' ', 0, columns_of_interest);
-  if(!parsed_information.empty()){
+  if (!parsed_information.empty()) {
     mem_total = std::stof(parsed_information[0]);
   }
 
@@ -135,10 +134,9 @@ float LinuxParser::MemoryUtilization() {
   parsed_information =
       LinuxParser::ParseProcessFile(kProcDirectory + kMeminfoFilename,
                                     "MemFree:", ' ', 0, columns_of_interest);
-  if(!parsed_information.empty()){
+  if (!parsed_information.empty()) {
     mem_free = std::stof(parsed_information[0]);
   }
-
 
   if (almost_equal(mem_total, 0.0f, 2)) {
     return 0.0f;
@@ -153,9 +151,9 @@ long LinuxParser::UpTime() {
   std::vector<int> columns_of_interest{0};
   parsed_information = LinuxParser::ParseProcessFile(
       kProcDirectory + kUptimeFilename, {}, ' ', 0, columns_of_interest);
-  if(!parsed_information.empty()){
+  if (!parsed_information.empty()) {
     return stol(parsed_information[0]);
-  }else{
+  } else {
     return 0;
   }
 }
@@ -253,9 +251,9 @@ int LinuxParser::TotalProcesses() {
   parsed_information = LinuxParser::ParseProcessFile(
       kProcDirectory + kStatFilename, "processes", ' ', 0, columns_of_interest);
 
-  if (!parsed_information.empty()){
+  if (!parsed_information.empty()) {
     return std::stoi(parsed_information[0]);
-  }else{
+  } else {
     return 0;
   }
 }
@@ -267,9 +265,9 @@ int LinuxParser::RunningProcesses() {
   parsed_information = LinuxParser::ParseProcessFile(
       kProcDirectory + kStatFilename, "procs_running", ' ', 0,
       columns_of_interest);
-  if (!parsed_information.empty()){
+  if (!parsed_information.empty()) {
     return std::stoi(parsed_information[0]);
-  }else{
+  } else {
     return 0;
   }
 }
@@ -354,11 +352,11 @@ long LinuxParser::UpTime(int pid) {
       kProcDirectory + std::to_string(pid) + kStatFilename, {}, ' ', 0,
       columns_of_interest);
 
-  if (!parsed_information.empty()){
+  if (!parsed_information.empty()) {
     return LinuxParser::UpTime() -
            (stoll(parsed_information[0])) /
-           static_cast<long long>(sysconf(_SC_CLK_TCK));
-  }else{
+               static_cast<long long>(sysconf(_SC_CLK_TCK));
+  } else {
     return 0;
   }
 }

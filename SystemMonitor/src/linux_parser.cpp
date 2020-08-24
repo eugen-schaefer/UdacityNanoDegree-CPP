@@ -89,7 +89,12 @@ string LinuxParser::Kernel() {
   std::vector<int> columns_of_interest{2};
   parsed_information = LinuxParser::ParseProcessFile(
       kProcDirectory + kVersionFilename, {}, ' ', 0, columns_of_interest);
-  return parsed_information[0];
+  if(!parsed_information.empty()){
+    return parsed_information[0];
+  }else{
+    return {};
+  }
+
 }
 
 // BONUS: Update this to use std::filesystem
@@ -121,12 +126,19 @@ float LinuxParser::MemoryUtilization() {
   parsed_information =
       LinuxParser::ParseProcessFile(kProcDirectory + kMeminfoFilename,
                                     "MemTotal:", ' ', 0, columns_of_interest);
-  mem_total = std::stof(parsed_information[0]);
+  if(!parsed_information.empty()){
+    mem_total = std::stof(parsed_information[0]);
+  }
+
+  parsed_information.clear();
 
   parsed_information =
       LinuxParser::ParseProcessFile(kProcDirectory + kMeminfoFilename,
                                     "MemFree:", ' ', 0, columns_of_interest);
-  mem_free = std::stof(parsed_information[0]);
+  if(!parsed_information.empty()){
+    mem_free = std::stof(parsed_information[0]);
+  }
+
 
   if (almost_equal(mem_total, 0.0f, 2)) {
     return 0.0f;
@@ -141,7 +153,11 @@ long LinuxParser::UpTime() {
   std::vector<int> columns_of_interest{0};
   parsed_information = LinuxParser::ParseProcessFile(
       kProcDirectory + kUptimeFilename, {}, ' ', 0, columns_of_interest);
-  return stol(parsed_information[0]);
+  if(!parsed_information.empty()){
+    return stol(parsed_information[0]);
+  }else{
+    return 0;
+  }
 }
 
 // Read and return the number of jiffies for the system
@@ -236,7 +252,12 @@ int LinuxParser::TotalProcesses() {
   std::vector<int> columns_of_interest{1};
   parsed_information = LinuxParser::ParseProcessFile(
       kProcDirectory + kStatFilename, "processes", ' ', 0, columns_of_interest);
-  return std::stoi(parsed_information[0]);
+
+  if (!parsed_information.empty()){
+    return std::stoi(parsed_information[0]);
+  }else{
+    return 0;
+  }
 }
 
 // Read and return the number of running processes
@@ -246,7 +267,11 @@ int LinuxParser::RunningProcesses() {
   parsed_information = LinuxParser::ParseProcessFile(
       kProcDirectory + kStatFilename, "procs_running", ' ', 0,
       columns_of_interest);
-  return std::stoi(parsed_information[0]);
+  if (!parsed_information.empty()){
+    return std::stoi(parsed_information[0]);
+  }else{
+    return 0;
+  }
 }
 
 // Read and return the command associated with a process
@@ -329,9 +354,13 @@ long LinuxParser::UpTime(int pid) {
       kProcDirectory + std::to_string(pid) + kStatFilename, {}, ' ', 0,
       columns_of_interest);
 
-  return LinuxParser::UpTime() -
-         (stoll(parsed_information[0])) /
-             static_cast<long long>(sysconf(_SC_CLK_TCK));
+  if (!parsed_information.empty()){
+    return LinuxParser::UpTime() -
+           (stoll(parsed_information[0])) /
+           static_cast<long long>(sysconf(_SC_CLK_TCK));
+  }else{
+    return 0;
+  }
 }
 
 char LinuxParser::ProcessState(int pid) {

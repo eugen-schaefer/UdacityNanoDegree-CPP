@@ -147,7 +147,7 @@ long LinuxParser::UpTime() {
 // Read and return the number of jiffies for the system
 long LinuxParser::Jiffies() {
   long jiffies_total{};
-  std::vector<std::string> parsed_cpu_numbers = LinuxParser::CpuUtilization();
+  std::vector<std::string> parsed_cpu_numbers = LinuxParser::CpuTimeParser();
   for (const std::string& jiffy : parsed_cpu_numbers) {
     jiffies_total += std::stol(jiffy);
   }
@@ -176,26 +176,46 @@ long LinuxParser::ActiveJiffies(int pid) {
   return 0;
 }
 
-char LinuxParser::ProcessState(int pid) {
-  std::vector<std::string> parsed_process_status =
-      LinuxParser::ProcessStatus(pid);
-  if (!parsed_process_status.empty()) {
-    std::string retVal{parsed_process_status[static_cast<int>(
-        LinuxParser::PROCESS_STAT::state)]};
-    return retVal[0];
+// Read and return the number of active jiffies for the system
+long LinuxParser::ActiveJiffies() {
+  long number_active_jiffies{};
+  std::vector<std::string> parsed_cpu_numbers = LinuxParser::CpuTimeParser();
+  if (!parsed_cpu_numbers.empty()) {
+    number_active_jiffies += std::stol(parsed_cpu_numbers[static_cast<int>(
+                                 LinuxParser::CPU_STATES::user)]) +
+                             std::stol(parsed_cpu_numbers[static_cast<int>(
+                                 LinuxParser::CPU_STATES::nice)]) +
+                             std::stol(parsed_cpu_numbers[static_cast<int>(
+                                 LinuxParser::CPU_STATES::system)]) +
+                             std::stol(parsed_cpu_numbers[static_cast<int>(
+                                 LinuxParser::CPU_STATES::irq)]) +
+                             std::stol(parsed_cpu_numbers[static_cast<int>(
+                                 LinuxParser::CPU_STATES::soft_irq)]) +
+                             std::stol(parsed_cpu_numbers[static_cast<int>(
+                                 LinuxParser::CPU_STATES::steal)]) +
+                             std::stol(parsed_cpu_numbers[static_cast<int>(
+                                 LinuxParser::CPU_STATES::guest)]) +
+                             std::stol(parsed_cpu_numbers[static_cast<int>(
+                                 LinuxParser::CPU_STATES::guest_nice)]);
   }
-  return ' ';
+  return number_active_jiffies;
 }
 
-// TODO: Read and return the number of active jiffies for the system
-long LinuxParser::ActiveJiffies() { return 0; }
-
-// TODO: Read and return the number of idle jiffies for the system
-long LinuxParser::IdleJiffies() { return 0; }
+// Read and return the number of idle jiffies for the system
+long LinuxParser::IdleJiffies() {
+  long number_idle_jiffies{};
+  std::vector<std::string> parsed_cpu_numbers = LinuxParser::CpuTimeParser();
+  if (!parsed_cpu_numbers.empty()) {
+    number_idle_jiffies += std::stol(parsed_cpu_numbers[static_cast<int>(
+                               LinuxParser::CPU_STATES::idle)]) +
+                           std::stol(parsed_cpu_numbers[static_cast<int>(
+                               LinuxParser::CPU_STATES::io_wait)]);
+  }
+  return number_idle_jiffies;
+}
 
 // Read and return CPU utilization
-// TODO: rename function into proper name like e.g. CpuStateParser
-vector<std::string> LinuxParser::CpuUtilization() {
+vector<std::string> LinuxParser::CpuTimeParser() {
   std::vector<std::string> relevant_numbers;
   std::vector<std::string> parsed_information;
   std::vector<int> columns_of_interest{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
@@ -312,4 +332,15 @@ long LinuxParser::UpTime(int pid) {
   return LinuxParser::UpTime() -
          (stoll(parsed_information[0])) /
              static_cast<long long>(sysconf(_SC_CLK_TCK));
+}
+
+char LinuxParser::ProcessState(int pid) {
+  std::vector<std::string> parsed_process_status =
+      LinuxParser::ProcessStatus(pid);
+  if (!parsed_process_status.empty()) {
+    std::string retVal{parsed_process_status[static_cast<int>(
+        LinuxParser::PROCESS_STAT::state)]};
+    return retVal[0];
+  }
+  return ' ';
 }

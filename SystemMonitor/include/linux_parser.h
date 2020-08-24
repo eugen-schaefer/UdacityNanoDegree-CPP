@@ -117,7 +117,7 @@ enum class CPU_STATES : unsigned int {
   guest_nice
 };
 
-std::vector<std::string> CpuUtilization();
+std::vector<std::string> CpuTimeParser();
 long Jiffies();
 long ActiveJiffies();
 long ActiveJiffies(int pid);

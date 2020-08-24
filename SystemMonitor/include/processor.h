@@ -7,14 +7,10 @@ class Processor {
 
   // Declare any necessary private members
  private:
-  float user{};
-  float nice{};
-  float system{};
-  float idle{};
-  float iowait{};
-  float irq{};
-  float softirq{};
-  float steal{};
+  long previous_idle_time{};
+  long previous_non_idle_time{};
+  long current_idle_time{};
+  long current_non_idle_time{};
 };
 
 #endif

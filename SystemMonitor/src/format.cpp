@@ -11,14 +11,14 @@ string Format::ElapsedTime(long seconds) {
   std::string sminutes{};
   std::string sseconds{};
 
-  int huors{static_cast<int>(seconds / 3600)};
+  int hours{static_cast<int>(seconds / 3600)};
   int minutes{(static_cast<int>(seconds / 60)) % 60};
   int sec{(static_cast<int>(seconds)) % 60};
 
-  if (huors < 10) {
-    shours = "0" + std::to_string(huors);
+  if (hours < 10) {
+    shours = "0" + std::to_string(hours);
   } else {
-    shours = std::to_string(huors);
+    shours = std::to_string(hours);
   }
 
   if (minutes < 10) {

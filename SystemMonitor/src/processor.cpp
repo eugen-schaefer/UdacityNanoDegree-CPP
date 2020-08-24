@@ -10,20 +10,28 @@
 float Processor::Utilization() {
   std::vector<std::string> parsed_cpu_numbers = LinuxParser::CpuUtilization();
 
-  if (!parsed_cpu_numbers.empty()){
+  if (!parsed_cpu_numbers.empty()) {
     // old values from last cycle are the previous ones
     float previous_idle_time{idle + iowait};
     float previous_non_idle_time{user + nice + system + irq + softirq + steal};
 
     // assign currently parsed values
-    user = std::stof(parsed_cpu_numbers[LinuxParser::kUser_]);
-    nice = std::stof(parsed_cpu_numbers[LinuxParser::kNice_]);
-    system = std::stof(parsed_cpu_numbers[LinuxParser::kSystem_]);
-    idle = std::stof(parsed_cpu_numbers[LinuxParser::kIdle_]);
-    iowait = std::stof(parsed_cpu_numbers[LinuxParser::kIOwait_]);
-    irq = std::stof(parsed_cpu_numbers[LinuxParser::kIRQ_]);
-    softirq = std::stof(parsed_cpu_numbers[LinuxParser::kSoftIRQ_]);
-    steal = std::stof(parsed_cpu_numbers[LinuxParser::kSteal_]);
+    user = std::stof(
+        parsed_cpu_numbers[static_cast<int>(LinuxParser::CPU_STATES::user)]);
+    nice = std::stof(
+        parsed_cpu_numbers[static_cast<int>(LinuxParser::CPU_STATES::nice)]);
+    system = std::stof(
+        parsed_cpu_numbers[static_cast<int>(LinuxParser::CPU_STATES::system)]);
+    idle = std::stof(
+        parsed_cpu_numbers[static_cast<int>(LinuxParser::CPU_STATES::idle)]);
+    iowait = std::stof(
+        parsed_cpu_numbers[static_cast<int>(LinuxParser::CPU_STATES::io_wait)]);
+    irq = std::stof(
+        parsed_cpu_numbers[static_cast<int>(LinuxParser::CPU_STATES::irq)]);
+    softirq = std::stof(parsed_cpu_numbers[static_cast<int>(
+        LinuxParser::CPU_STATES::soft_irq)]);
+    steal = std::stof(
+        parsed_cpu_numbers[static_cast<int>(LinuxParser::CPU_STATES::steal)]);
 
     // new assigned values are the current ones
     float current_idle_time{idle + iowait};
@@ -35,9 +43,8 @@ float Processor::Utilization() {
     float total_difference{current_total_time - previous_total_time};
     float idle_difference{current_idle_time - previous_idle_time};
 
-    return (total_difference - idle_difference)/total_difference;
-  }else
-  {
+    return (total_difference - idle_difference) / total_difference;
+  } else {
     return 0.0f;
   }
 }

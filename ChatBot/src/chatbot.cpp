@@ -45,7 +45,66 @@ ChatBot::~ChatBot()
 //// STUDENT CODE
 ////
 
-////
+
+ChatBot::ChatBot(const ChatBot& source){       // copy constructor
+  std::cout << "ChatBot Copy Constructor: COPYING content of instance " << &source << " to instance " << this << std::endl;
+  _image = new wxBitmap;
+  *_image = *source._image;
+  _rootNode = source._rootNode;
+  _chatLogic = source._chatLogic;
+  _chatLogic->SetChatbotHandle(this);
+}
+
+ChatBot::ChatBot(ChatBot&& source){           // move constructor
+  std::cout << "ChatBot Move Constructor: MOVING instance " << &source << " to instance " << this << std::endl;
+  _image = source._image;
+  _chatLogic = source._chatLogic;
+  _rootNode = source._rootNode;
+
+  delete source._image;
+  source._image = NULL;
+  source._chatLogic = nullptr;
+  source._rootNode = nullptr;
+}
+
+ChatBot& ChatBot::operator=(const ChatBot& source){   // copy assignment operator
+  std::cout << "ChatBot copy assignment operator: ASSIGNING content of instance " << &source << " to instance " << this << std::endl;
+  if (&source == this){
+    return *this;
+  }
+
+  if (_image) {
+    delete _image;
+    _image = new wxBitmap;
+    *_image = *source._image;
+  }
+  _rootNode = source._rootNode;
+  _chatLogic = source._chatLogic;
+  _chatLogic->SetChatbotHandle(this);
+  return *this;
+}
+
+ChatBot& ChatBot::operator=(ChatBot&& source){    //  move assignment operator
+  std::cout << "ChatBot move assignment operator: MOVING (assign) instance " << &source << " to instance " << this << std::endl;
+  if (&source == this){
+    return *this;
+  }
+
+  if (_image) {
+    delete _image;
+    _image = source._image;
+    source._image = NULL;
+  }
+
+  _chatLogic = source._chatLogic;
+  source._chatLogic = nullptr;
+
+  _rootNode = source._rootNode;
+  _rootNode = nullptr;
+
+  return *this;
+}
+
 //// EOF STUDENT CODE
 
 void ChatBot::ReceiveMessageFromUser(std::string message)

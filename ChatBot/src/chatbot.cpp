@@ -50,25 +50,25 @@ ChatBot::ChatBot(const ChatBot& source){       // copy constructor
   std::cout << "ChatBot Copy Constructor: COPYING content of instance " << &source << " to instance " << this << std::endl;
   _image = new wxBitmap;
   *_image = *source._image;
-  //_image = source._image;
   _chatLogic = source._chatLogic;
+  _chatLogic->SetChatbotHandle(this);
   _rootNode = source._rootNode;
   _currentNode = source._currentNode;
-  _chatLogic->SetChatbotHandle(this);
 }
 
 ChatBot::ChatBot(ChatBot&& source){           // move constructor
   std::cout << "ChatBot Move Constructor: MOVING instance " << &source << " to instance " << this << std::endl;
   _image = source._image;
+  source._image = NULL;
+
   _chatLogic = source._chatLogic;
   _chatLogic->SetChatbotHandle(this);
-  _rootNode = source._rootNode;
-  _currentNode = source._currentNode;
-
-  //delete source._image;
-  source._image = NULL;
   source._chatLogic = nullptr;
+
+  _rootNode = source._rootNode;
   source._rootNode = nullptr;
+
+  _currentNode = source._currentNode;
   source._currentNode = nullptr;
 }
 
@@ -78,14 +78,13 @@ ChatBot& ChatBot::operator=(const ChatBot& source){   // copy assignment operato
     return *this;
   }
 
-  if (_image) {
-    delete _image;
-    _image = new wxBitmap;
-    *_image = *source._image;
-  }
-  _rootNode = source._rootNode;
+  delete _image;
+  _image = new wxBitmap;
+  *_image = *source._image;
+
   _chatLogic = source._chatLogic;
   _chatLogic->SetChatbotHandle(this);
+  _rootNode = source._rootNode;
   _currentNode = source._currentNode;
   return *this;
 }
@@ -96,10 +95,7 @@ ChatBot& ChatBot::operator=(ChatBot&& source){    //  move assignment operator
     return *this;
   }
 
-  if (_image) {
-    delete _image;
-  }
-
+  delete _image;
   _image = source._image;
   source._image = NULL;
 
@@ -107,11 +103,12 @@ ChatBot& ChatBot::operator=(ChatBot&& source){    //  move assignment operator
   _chatLogic->SetChatbotHandle(this);
   source._chatLogic = nullptr;
 
+  _rootNode = source._rootNode;
+  source._rootNode = nullptr;
+
   _currentNode = source._currentNode;
   source._currentNode = nullptr;
 
-  _rootNode = source._rootNode;
-  //_rootNode = nullptr;
 
   return *this;
 }

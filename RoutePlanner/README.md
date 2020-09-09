@@ -23,10 +23,11 @@ This repo contains the completed code for the [Route Planning project](https://g
 ## Compiling and Running
 
 ### Compiling
-To compile the project, first, create a `build` directory and change to that directory:
-```
-mkdir build && cd build
-```
+
+1. Clone the entire repo as explained [HERE](https://github.com/eugen-schaefer/UdacityNanoDegree-CPP/blob/master/README.md)
+2. change directory to UdacityNanoDegree-CPP/RoutePlanner/
+2. Make a build directory in the RoutePlanner directory and change into it: `mkdir build && cd build`
+
 From within the `build` directory, then run `cmake` and `make` as follows:
 ```
 cmake ..

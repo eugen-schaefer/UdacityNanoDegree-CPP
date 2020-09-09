@@ -20,7 +20,7 @@ This project uses [Make](https://www.gnu.org/software/make/). The Makefile has f
 
 ## Instructions
 
-1. `cd path/to/cloned_repo/SystemMonitor`
+1. `cd path/to/cloned_repo/SystemMonitor` see [HERE](https://github.com/eugen-schaefer/UdacityNanoDegree-CPP/blob/master/README.md) how to clone the repo.
 
 2. Build the project: `make build`
 

@@ -20,9 +20,9 @@ This project uses [Make](https://www.gnu.org/software/make/). The Makefile has f
 
 ## Instructions
 
-1. `cd path/to/cloned_repo/SystemMonitor` see [HERE](https://github.com/eugen-schaefer/UdacityNanoDegree-CPP/blob/master/README.md) how to clone the repo.
-
-2. Build the project: `make build`
-
-3. Run the resulting executable: `./build/monitor`
+1. Clone the entire repo as explained [HERE](https://github.com/eugen-schaefer/UdacityNanoDegree-CPP/blob/master/README.md)
+2. change directory to UdacityNanoDegree-CPP/SystemMonitor/
+3. Make a build directory in SystemMonitor: `mkdir build && cd build`
+4. Compile: `cmake .. && make`
+3. Run the resulting executable: `./monitor`
 ![Starting System Monitor](images/starting_monitor.png)

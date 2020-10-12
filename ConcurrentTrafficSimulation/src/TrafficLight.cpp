@@ -23,11 +23,14 @@ void MessageQueue<T>::send(T &&msg)
 
 /* Implementation of class "TrafficLight" */
 
-/* 
+
 TrafficLight::TrafficLight()
 {
     _currentPhase = TrafficLightPhase::red;
+    _type = ObjectType::objectTrafficLight;
 }
+
+/*
 
 void TrafficLight::waitForGreen()
 {
@@ -45,6 +48,7 @@ void TrafficLight::simulate()
 {
     // FP.2b : Finally, the private method „cycleThroughPhases“ should be started in a thread when the public method „simulate“ is called. To do this, use the thread queue in the base class. 
 }
+*/
 
 // virtual function which is executed in a thread
 void TrafficLight::cycleThroughPhases()
@@ -55,4 +59,3 @@ void TrafficLight::cycleThroughPhases()
     // Also, the while-loop should use std::this_thread::sleep_for to wait 1ms between two cycles. 
 }
 
-*/

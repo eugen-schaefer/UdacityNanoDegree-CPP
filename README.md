@@ -4,13 +4,14 @@ This repo contains the code which is neccesary to pass the Udacity C++ Nanodegre
  * [Route Planner](https://github.com/eugen-schaefer/UdacityNanoDegree-CPP/tree/master/RoutePlanner)
  * [System Monitor](https://github.com/eugen-schaefer/UdacityNanoDegree-CPP/tree/master/SystemMonitor)
  * [ChatBot](https://github.com/eugen-schaefer/UdacityNanoDegree-CPP/tree/master/ChatBot)
- * Simulation
- * Capstone Project
+ * [Simulation](https://github.com/eugen-schaefer/UdacityNanoDegree-CPP/tree/master/ConcurrentTrafficSimulation)
+ * [Capstone Project](https://github.com/eugen-schaefer/Tetris)
 
 ## Cloning
 
-When cloning this project, be sure to use the `--recurse-submodules` flag. Using HTTPS:
+When cloning this project, be sure to use the `--recurse-submodules` flag. 
+
+Using HTTPS:
 ```
 git clone https://github.com/eugen-schaefer/UdacityNanoDegree-CPP.git --recurse-submodules
 ```
-
